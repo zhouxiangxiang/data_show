@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- <link  rel="stylesheet" type="text/css"  href="./templates/data_show/css/style.css"> -->
+
+    <style>
+        body {
+              font: 10px sans-serif;
+        }
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+        .point {
+            fill: steelblue;
+            stroke: #000;
+        }
+    </style>
+
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+</head>
+
+<body>
+
+<script>
+
+var svg = d3.select("body").append("svg");
+var xAxis = d3.svg.axis()
+         .scale(xScale)
+         .orient("bottom");
+svg.append("g").call(xAxis);
+/*
+    d3.select("body").append("svg")
+                       .attr("class", "axis")
+                       .attr("width", "1440")
+                       .attr("height", "30")
+                     .append("g")
+                       .attr("transform", "translate(0, 30)")
+                       .call(axis);
+                       */
+//    d3.svg.axis();
+</script>
+
+</body>
+
+</html>
