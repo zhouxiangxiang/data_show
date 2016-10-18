@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<meta charset="urf-8">
+
+<html>
+
+<head>
+</head>
+
+<body>
+
+<form action="index" method="post">
+    {% csrf_token %}
+    <label for="your_name"> Your name: </label>
+    <input id="your_name" type="text" name="your_name" maxlength="100" required />
+    {{ form }}
+    <input type="submit" value="Submit" />
+
+</form>
+
+</body>
+
+</html>

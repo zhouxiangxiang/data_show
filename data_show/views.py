@@ -7,16 +7,62 @@ from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.template import loader
 
-from .models import Play
+from .models import *
 
-def graph(request):
-    #return HttpResponse("hello world. You are at the d3 index")
-    #return render(request, 'data_show/graph.html')
+from .forms import *
+
+def get_index(request):
+    if request.method == 'POST':
+        form = NodeForm(request.POST)
+        if form.is_valid():
+            return HttpResponse(form.cleaned_data['node_name'])
+        else:
+            form = NameForm()
+            return render(request, 'data_show/index.html', {'form': form})
+
     return render(request, 'data_show/index.html')
 
+def get_data(request):
+    if request.method == 'POST':
+        form = NodeForm(request.POST)
+        if form.is_valid():
+            #return HttpResponse(form.cleaned_data['node_name'])
+            return HttpResponse(form.cleaned_data['node_name'])
+        else:
+            form = NodeForm()
+            return render(request, 'data_show/index.html', {'form': form})
+
+    return render(request, 'data_show/index.html')
+
+def get_name(request):
+    if request.method == 'POST':
+        form = NameForm(request.POST)
+        if form.is_valid():
+            return HttpResponse('thanks')
+        else:
+            form = NameForm()
+
+        return render(request, 'data_show/index', {'form': form})
+
+#def graph(request):
+    #return HttpResponse("hello world. You are at the d3 index")
+    #return render(request, 'data_show/graph.html')
+#    return render(request, 'index')
+
 def show(request):
-    return render(request, 'data_show/show.html')
+    # return render(request, 'data_show/show.html')
+
+    # read data from database
+    sd = SpeedData()
+    data = sd.get_data()
+    template = loader.get_template('data_show/show.html')
+    context = {
+            'data_show': data,
+            'title': 'title',
+    }
+    return HttpResponse(template.render(context, request))
 
 def data_tsv(request):
     fd = open('./data_show/data/data.tsv', 'r')
@@ -40,10 +86,4 @@ def play_count_by_month(request):
     #
     #return JsonResponser(list(data), safe=False)
     return HttpResponse("hello world. You are at the d3 index")
-
-
-
-
-
-
 

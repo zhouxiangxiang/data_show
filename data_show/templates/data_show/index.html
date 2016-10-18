@@ -1,27 +1,55 @@
 <!DOCTYPE html>
-<meta charset="urf-8">
 
 <html>
 
 <head>
+    <meta charset="urf-8">
+    <title>data show</title>
+    <style type="text/css">
+        #main-wrap > div {min-height: 450px;}
+        #header,
+        #footer {
+            background-color: #f1f1f1;
+            min-height: 40px;
+        }
+        #main-wrap{
+            background-color: #D9D9D9;
+            overflow:hidden;
+        }
+        #sidebar{
+            background-color: #d2d2d2;
+            float:left;
+            width:15%;
+        }
+        #content-wrap{
+            background-color: #c5c5c5;
+            float: right;
+            width: 85%;
+        }
+    </style>
 </head>
 
 <body>
 
-<script src="http://d3js.org/d3.v3.js"> </script>
-<script>
-var body = d3.select("body");
-body.style("color", "black");
-body.style("background-color", "white");
+<div id="header">Header</div>
+<div id="main-wrap">
+    <!-- Left Nav -->
+    <div id="sidebar">
+        <form action="show_data" method="post">
+            {% csrf_token %}
+            <label for="node_name">Node Name: </label>
+            <input id="node_name" type="text" name="node_name">
+            <input type="submit" value="OK">
+        </form>
+    </div>
 
-var data = [4, 8, 15, 16, 23, 42];
+    <div id="content-wrap">
+        <br>
+        CONTENT
+    </div>
+</div>
 
-var div = document.createElement("div");
-div.innerHTML = "--- hello world";
-document.body.appendChild(div);
-
-
-</script>
+<div id="footer">Footer</div>
 
 </body>
 
