@@ -37,11 +37,11 @@ def get_data(request):
             data = []
             for item in nn:
                 data_nn = sd.get_node_name_speed_time(item)
-                for i in range(len(data_nn)):
-                    s_t = data_nn[i]
-                    s_t = (s_t[0],
-                           datetime.datetime.fromtimestamp(int(s_t[1])).strftime('%H:%M:%S'))
-                    data_nn[i] = s_t 
+                #for i in range(len(data_nn)):
+                #    s_t = data_nn[i]
+                #    s_t = (s_t[0],
+                #           datetime.datetime.fromtimestamp(int(s_t[1])).strftime('%H:%M:%S'))
+                #    data_nn[i] = s_t 
                 for s_t in data_nn:
                     print(s_t)
                 data.append(data_nn)
@@ -83,8 +83,8 @@ def data_css(request):
 
     return data
 
-def data_tsv(request):
-    fd = open('./data_show/templates/data_show/data.tsv', 'r')
+def data_csv(request):
+    fd = open('./data_show/templates/data_show/data.csv', 'r')
     data = HttpResponse(fd.read())
     fd.close()
 
