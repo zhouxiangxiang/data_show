@@ -46,35 +46,36 @@
     
         <!-- Left Nav -->
         <div id="sidebar">
+            <script>
+                var  json_obj = JSON.parse("{{ data | escapejs }}");
+                console.log(json_obj["node_name"]);
+            </script>
+            
+            <!--
             {% if node_name %}
                 {% for item in node_name %}
                 {{ item }}
                 {% endfor %}
             {% endif %}
+            -->
         </div>
     
         <div id="content-wrap">
-            {% if data %}
-                {% for data_nn in data %}
-                    {% for item in data_nn %}
-                        {{ item }}
-                        <br>
-                    {% endfor %}
-                {% endfor %}
-            {% endif %}
-        
             <script type="text/javascript">
             var w = 500;
             var h = 300;
             var padding = 40;
-            /*
-            var dataset = [
-            [5, 20], [480, 90], [250, 50], [100, 33], [330, 95],
-            [410, 12], [475, 44], [25, 67], [85, 21], [220, 88],
-            [600, 150]
-            ];
-            */
-            var dataset = {{ data }}
+            var json_obj = JSON.parse("{{ data | escapejs }}");
+            var data = json_obj["data"];
+
+            var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
+            var dataset = [];
+            for (i = 0; i < data.length; i++) {
+                data[i][1] = parseDate(data[i][1]);
+                console.log(data[i]);
+                console.log("----------");
+                dataset.push(data[i]);
+            }
             
             var xScale = d3.scale.linear()
                             .domain([0, d3.max(dataset, function(d) { return d[0]; })])

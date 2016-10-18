@@ -31,8 +31,6 @@
 </head>
 
 <body>
-    test
-    <br>
     <script>
     var margin = {top: 20, right: 20, bottom: 30, left: 50};
     var width  = 590 - margin.left - margin.right;
@@ -63,11 +61,11 @@
         if (error) throw error;
         
         data.forEach(function(d) {
+            console.log(d.date);
             d.date = parseDate(d.date);
             d.close = +d.close;
         });
     
-        //在这里对读取的数据进行绘图处理
         x.domain(d3.extent(data, function(d) { return d.date; }));
         y.domain(d3.extent(data, function(d) { return d.close; }));
         
@@ -90,14 +88,12 @@
                         .text("我的数据");
         
         
-        //定义纵轴网格线
         var yInner = d3.svg.axis()
                 .scale(y)
                 .tickSize(-width,0,0)
                 .tickFormat("")
                 .orient("left")
                 .ticks(5);
-        //添加纵轴网格线
         var yInnerBar=svg.append("g")
                 .attr("class", "inner_line")
                 .attr("transform", "translate(0,-25)")
@@ -110,9 +106,7 @@
             .transition()
             .duration(2000)
             .attr("opacity", 1);
-        
-/*
-        // 散点
+
         var points = svg.selectAll(".MyCircle")
                 .data(data)
                 .enter()
@@ -126,7 +120,7 @@
                 .attr("cx", function(d){ return x(d.date); })
                 .attr("opacity", 1)
                 .attr("cy", function(d){ return y(d.close); });
-*/
+
         });
     </script>
 </body>

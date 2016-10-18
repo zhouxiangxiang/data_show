@@ -3,6 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 #from datetime import datetime
 import datetime
+import json
 
 from django.db import connections
 from django.db.models import Count
@@ -37,16 +38,21 @@ def get_data(request):
             data = []
             for item in nn:
                 data_nn = sd.get_node_name_speed_time(item)
-                #for i in range(len(data_nn)):
-                #    s_t = data_nn[i]
-                #    s_t = (s_t[0],
-                #           datetime.datetime.fromtimestamp(int(s_t[1])).strftime('%H:%M:%S'))
-                #    data_nn[i] = s_t 
+                for i in range(len(data_nn)):
+                    s_t = data_nn[i]
+                    s_t = [s_t[0],
+                            str(datetime.datetime.fromtimestamp(int(s_t[1])).strftime('%Y-%m-%d %H:%M:%S'))]
+                           #datetime.datetime.fromtimestamp(int(s_t[1])).strftime('%H:%M:%S'))
+                    data_nn[i] = s_t 
                 for s_t in data_nn:
                     print(s_t)
                 data.append(data_nn)
 
-            return render(request, 'data_show/show_data.html', {'node_name': nn, 'data': data})
+                pass_data = {'node_name': nn, 'data': data[0]}
+                json_str = json.dumps(pass_data)
+
+            #return render(request, 'data_show/show_data.html', {'node_name': nn, 'data': data[0]})
+            return render(request, 'data_show/show_data.html', {"data": json_str})
         else:
             form = NodeForm()
             return render(request, 'data_show/index.html', {'form': form})
