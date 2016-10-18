@@ -1,29 +1,80 @@
 from django.shortcuts import render
 
 # Create your views here.
+#from datetime import datetime
+import datetime
 
 from django.db import connections
 from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.template import loader
 
-from .models import Play
+from .models import *
 
-def graph(request):
-    #return HttpResponse("hello world. You are at the d3 index")
-    #return render(request, 'data_show/graph.html')
+from .forms import *
+
+def get_index(request):
+    if request.method == 'POST':
+        form = NodeForm(request.POST)
+        if form.is_valid():
+            return HttpResponse(form.cleaned_data['node_name'])
+        else:
+            form = NameForm()
+            return render(request, 'data_show/index.html', {'form': form})
+
     return render(request, 'data_show/index.html')
 
+def get_data(request):
+    if request.method == 'POST':
+        form = NodeForm(request.POST)
+        if form.is_valid():
+            node_name = form.cleaned_data['node_name']
+
+            sd = SpeedData()
+            nn = sd.get_node_name(node_name)
+            data = []
+            for item in nn:
+                data_nn = sd.get_node_name_speed_time(item)
+                for i in range(len(data_nn)):
+                    s_t = data_nn[i]
+                    s_t = (s_t[0],
+                           datetime.datetime.fromtimestamp(int(s_t[1])).strftime('%H:%M:%S'))
+                    data_nn[i] = s_t 
+                for s_t in data_nn:
+                    print(s_t)
+                data.append(data_nn)
+
+            return render(request, 'data_show/show_data.html', {'node_name': nn, 'data': data})
+        else:
+            form = NodeForm()
+            return render(request, 'data_show/index.html', {'form': form})
+
+    return render(request, 'data_show/index.html')
+
+def line_chart(request):
+    return render(request, 'data_show/line_chart.html')
+
+def get_name(request):
+    if request.method == 'POST':
+        form = NameForm(request.POST)
+        if form.is_valid():
+            return HttpResponse('thanks')
+        else:
+            form = NameForm()
+
+        return render(request, 'data_show/index', {'form': form})
+
 def show(request):
-    return render(request, 'data_show/show.html')
-
-def data_tsv(request):
-    fd = open('./data_show/data/data.tsv', 'r')
-    data = HttpResponse(fd.read())
-    fd.close()
-
-    return data
+    sd = SpeedData()
+    data = sd.get_data()
+    template = loader.get_template('data_show/show.html')
+    context = {
+            'data_show': data,
+            'title': 'title',
+    }
+    return HttpResponse(template.render(context, request))
 
 def data_css(request):
     fd = open('./data_show/templates/data_show/css/style.css', 'r')
@@ -32,18 +83,9 @@ def data_css(request):
 
     return data
 
-def play_count_by_month(request):
-    #data = Play.objects.all() \
-    #        .extra(select={'month': connections[Play.objects.db].ops.date_trunc_sql('moth', 'date')}) \
-    #        .values('month') \
-    #        .annotate(count_items=Count('id'))
-    #
-    #return JsonResponser(list(data), safe=False)
-    return HttpResponse("hello world. You are at the d3 index")
+def data_tsv(request):
+    fd = open('./data_show/templates/data_show/data.tsv', 'r')
+    data = HttpResponse(fd.read())
+    fd.close()
 
-
-
-
-
-
-
+    return data
