@@ -37,12 +37,27 @@ def get_data(request):
             nn = sd.get_node_name(node_name)
             data = []
             for item in nn:
-                data_nn = sd.get_node_name_speed_time(item)
+
+                data_nn = sd.get_node_name_speed_time(item, "220.181.77.98")
+                # sort by timestamp
+                def getKey(tmp):
+                    return tmp[1];
+
+                data_nn = sorted(data_nn, key=getKey)
+                # data_nn = data_nn[:-40]
+                start = 0
                 for i in range(len(data_nn)):
                     s_t = data_nn[i]
-                    s_t = [s_t[0],
-                            str(datetime.datetime.fromtimestamp(int(s_t[1])).strftime('%Y-%m-%d %H:%M:%S'))]
-                           #datetime.datetime.fromtimestamp(int(s_t[1])).strftime('%H:%M:%S'))
+                    if not start:
+                        start = s_t[1]
+                    else:
+                        st_tm = datetime.datetime.fromtimestamp(start).strftime('%Y-%m-%d')
+                        cur_tm = datetime.datetime.fromtimestamp(s_t[1]).strftime('%Y-%m-%d')
+                        if st_tm != cur_tm:
+                            break;
+
+                    s_t = [s_t[0] / 1024,
+                           datetime.datetime.fromtimestamp(s_t[1]).strftime('%Y-%m-%d %H:%M:%S')]
                     data_nn[i] = s_t 
                 for s_t in data_nn:
                     print(s_t)

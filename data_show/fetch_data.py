@@ -65,8 +65,19 @@ class FetchData:
 class FetchSpeedData(FetchData):
     def __init__(self, db_info):
         FetchData.__init__(self, db_info)
+        self.transfer_node = []
         self.all_node_room = []
         self.all_node_name = {}
+
+    def get_transfer_node(self, tn):
+        if not self.transfer_node:
+            pattern = 'SELECT host FROM %s GROUP BY host'%(tn)
+            data = self.fetch_data(pattern)
+            for item in data:
+                self.transfer_node.append(item[0])
+
+        return self.transfer_node
+
 
     def get_all_node_room(self, table_name):
         if not self.all_node_room:
@@ -114,8 +125,8 @@ class FetchSpeedData(FetchData):
 
         return self.fetch_data(pattern)
 
-    def get_nn_ST(self, tn, nn):
-        pattern = 'SELECT speed, timestamp  FROM %s WHERE node_name="%s"'%(tn, nn)
+    def get_nn_ST(self, tn, nn, transfer_node):
+        pattern = 'SELECT speed, timestamp  FROM %s WHERE node_name="%s" and host="%s"'%(tn, nn, transfer_node)
 
         return self.fetch_data(pattern)
 
@@ -138,6 +149,12 @@ def main():
 
     #fd = FetchSpeedData(host, port, user, passwd, db)
     fd = FetchSpeedData(db_info)
+
+    print('get tranfer node')
+    tn = fd.get_transfer_node('tmp')
+    print(tn)
+    print
+
     print('get_all_node_room')
     nr = fd.get_all_node_room('tmp')
     print(nr)

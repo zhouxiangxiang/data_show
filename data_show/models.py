@@ -17,6 +17,9 @@ class  SpeedData:
         self.fd = FetchSpeedData(self.db_info)
         self.tb_name = 'tmp'
 
+    def get_transfer_node(self):
+        tn = self.fd.get_transfer_node(self.tb_name)
+        return tn;
     def get_node_name(self, nr):  # node room
         nn = self.fd.get_node_name(self.tb_name, nr)
         return nn
@@ -25,6 +28,6 @@ class  SpeedData:
         data = self.fd.get_node_name_data(self.tb_name, nn)
         return data
 
-    def get_node_name_speed_time(self, nn):
-        data =  self.fd.get_nn_ST(self.tb_name, nn) # speed time
+    def get_node_name_speed_time(self, nn, transfer_node):
+        data =  self.fd.get_nn_ST(self.tb_name, nn, transfer_node) # speed time
         return data
