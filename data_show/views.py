@@ -18,7 +18,7 @@ def get_index(request):
     if request.method == 'POST':
         form = NodeForm(request.POST)
         if form.is_valid():
-            return HttpResponse(form.cleaned_data['node_name'])
+            return HttpResponse(form.cleaned_data['node_room'])
         else:
             form = NameForm()
             return render(request, 'data_show/index.html', {'form': form})
@@ -44,13 +44,16 @@ def get_data(request):
     if request.method == 'POST':
         form = NodeForm(request.POST)
         if form.is_valid():
-            node_name = form.cleaned_data['node_name']
+            node_room = form.cleaned_data['node_room']
 
             sd = SpeedData()
-            nn = sd.get_node_name(node_name)
-            data = []
-            for item in nn:
+            node_name = sd.get_node_name(node_room)
 
+            print(node_room)
+            print(node_name)
+
+            data = []
+            for item in node_name:
                 data_nn = sd.get_node_name_speed_time(item, "220.181.77.98")
                 # sort by timestamp
                 def getKey(tmp):
@@ -71,12 +74,11 @@ def get_data(request):
                     s_t = [s_t[0] / 1024,
                            datetime.datetime.fromtimestamp(s_t[1]).strftime('%Y-%m-%d %H:%M:%S')]
                     data_nn[i] = s_t 
-                for s_t in data_nn:
-                    print(s_t)
-                data.append(data_nn)
 
-                pass_data = {'node_name': nn, 'data': data[0]}
-                json_str = json.dumps(pass_data)
+                data.append({'node_name': item, 'data': data_nn})
+
+            json_str = json.dumps(data)
+            print(json_str)
 
             return render(request, 'data_show/show_data.html', {"data": json_str})
         else:

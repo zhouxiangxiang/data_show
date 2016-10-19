@@ -50,15 +50,17 @@
     var xAxis = d3.svg.axis()
                       .scale(x)
                       .orient("bottom")
-                      .tickFormat(d3.time.format("%M:%S"));
+                      .tickFormat(d3.time.format("%H:%M"));
     
     var yAxis = d3.svg.axis()
                       .scale(y)
                       .orient("left");
     
     var data = [];
-    var json_obj = JSON.parse("{{ data | escapejs }}");
-    var raw_data = json_obj["data"];
+    var raw_data = JSON.parse("{{ data | escapejs }}");
+    console.log(raw_data[0].node_name);
+    console.log(raw_data[0].data);
+    raw_data = raw_data[0].data;
     for (i = 0; i < raw_data.length; i++) {
         raw_data[i][1] = parseDate(raw_data[i][1]);
         unit = {"date": raw_data[i][1], "close": raw_data[i][0] };
