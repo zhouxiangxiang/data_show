@@ -1,7 +1,6 @@
 from django.shortcuts import render
 
 # Create your views here.
-#from datetime import datetime
 import datetime
 import json
 
@@ -13,7 +12,6 @@ from django.http import HttpResponse
 from django.template import loader
 
 from .models import *
-
 from .forms import *
 
 def get_index(request):
@@ -25,7 +23,22 @@ def get_index(request):
             form = NameForm()
             return render(request, 'data_show/index.html', {'form': form})
 
-    return render(request, 'data_show/index.html')
+    sd = SpeedData()
+    raw_nr = sd.get_node_room()
+
+    node_room = { "CUN": [], "CTN": [], "CMN": [], "OTH":[] }
+    for item in raw_nr:
+        if item.startswith("CUN"):
+            node_room["CUN"].append(item)
+        elif item.startswith("CTN"):
+            node_room["CTN"].append(item)
+        elif item.startswith("CMN"):
+            node_room["CMN"].append(item)
+        else:
+            node_room["OTH"].append(item)
+
+    json_str = json.dumps({'node_room': node_room})
+    return render(request, 'data_show/index.html', {'data': json_str})
 
 def get_data(request):
     if request.method == 'POST':
@@ -42,9 +55,8 @@ def get_data(request):
                 # sort by timestamp
                 def getKey(tmp):
                     return tmp[1];
-
                 data_nn = sorted(data_nn, key=getKey)
-                # data_nn = data_nn[:-40]
+
                 start = 0
                 for i in range(len(data_nn)):
                     s_t = data_nn[i]
@@ -66,7 +78,6 @@ def get_data(request):
                 pass_data = {'node_name': nn, 'data': data[0]}
                 json_str = json.dumps(pass_data)
 
-            #return render(request, 'data_show/show_data.html', {'node_name': nn, 'data': data[0]})
             return render(request, 'data_show/show_data.html', {"data": json_str})
         else:
             form = NodeForm()

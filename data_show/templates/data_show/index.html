@@ -44,8 +44,37 @@
     </div>
 
     <div id="content-wrap">
-        <br>
-        CONTENT
+        <script>
+            function output_node_room(category, dt_a) {
+                var delimiter = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                document.write(category);
+                document.write("<br>");
+
+                document.write(dt_a[0]);
+                document.write(delimiter);
+                for (i = 1; i < dt_a.length; i++) {
+                    document.write(dt_a[i]);
+                    document.write(delimiter);
+                    if (i%5 == 0) {
+                        document.write("<br>");
+                    }
+                    else if (i == dt_a.length - 1) {
+                        document.write("<br>");
+                    }
+                }
+                document.write("<br>");
+            }
+
+            var json_obj = JSON.parse("{{ data | escapejs }}");
+            cun_nr = json_obj["node_room"]["CUN"];
+            ctn_nr = json_obj["node_room"]["CTN"];
+            cmn_nr = json_obj["node_room"]["CMN"];
+            oth_nr = json_obj["node_room"]["OTH"];
+            output_node_room("CUN",cun_nr);
+            output_node_room("CTN",ctn_nr);
+            output_node_room("CMN",cmn_nr);
+            output_node_room("OTH",oth_nr);
+        </script>
     </div>
 </div>
 
