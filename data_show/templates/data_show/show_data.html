@@ -33,27 +33,30 @@
 <body>
     <script>
     var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
-    var data = [];
     var data_json = JSON.parse("{{ data | escapejs }}"); // an array: {"node_name": node-name, "tn_data": transfer-node-data }
     // data_json[0].node_name; // string
     // data_json[0].tn_data; // an array
-    console.log(data_json);
 
-    var raw_data = data_json[0].tn_data[0];
-    raw_data = raw_data.data;
-    console.log(raw_data);
+    var node_room = data_json[0];
+    var tn_data = node_room.tn_data;
+    var node_name = node_room.node_name; 
 
-    console.log("---: before data processing");
-    for (i = 0; i < raw_data.length; i++) {
-        console.log(raw_data[i]);
-        raw_data[i][1] = parseDate(raw_data[i][1]);
-        unit = {"date": raw_data[i][1], "close": raw_data[i][0] };
-        data.push(unit);
+    for (i = 0; i < tn_data.length; i++) {
+        var data = [];
+        var raw_data = tn_data[i].data;
+        var t_node = tn_data[i].t_node;
+        console.log(raw_data);
+
+        for (j = 0; j < raw_data.length; j++) {
+            raw_data[j][1] = parseDate(raw_data[j][1]);
+            unit = {"date": raw_data[j][1], "close": raw_data[j][0] };
+            data.push(unit);
+        }
+
+        line_chart(data, node_name, t_node);
     }
 
-    line_chart(data);
-
-function line_chart(data) {
+function line_chart(data, node_name, t_node) {
     var margin = {top: 20, right: 20, bottom: 30, left: 100};
     var width  = 1000 - margin.left - margin.right;
     var height = 500 - margin.top - margin.bottom;
@@ -100,10 +103,10 @@ function line_chart(data) {
                     .append("text")
                     .attr("transform", "rotate(0)")
                     .attr("y", 25)
-                    .attr("x", 75)
+                    .attr("x", 250)
                     .attr("dy", ".71em")
                     .style("text-anchor", "end")
-                    .text("data show");
+                    .text(node_name + " : " + t_node);
     console.log("---: before Inner");
 
 
