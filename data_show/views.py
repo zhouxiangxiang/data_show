@@ -80,7 +80,7 @@ def get_data(request):
                                       datetime.datetime.fromtimestamp(s_t[1]).strftime('%Y-%m-%d %H:%M:%S')]
 
 
-                    tn_data.append({'t_node':t_node, 'data' : data_nn })
+                    tn_data.append({'t_node':i_tn, 'data' : data_nn })
                 data.append( {'node_name': i_nn, 'tn_data': tn_data })
 
             json_str = json.dumps(data)
