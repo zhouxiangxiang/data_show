@@ -12,7 +12,7 @@
         }
         .line {
             fill: none;
-            stroke: #FCAD62;
+            stroke: #008000;
             stroke-width: 1.5px;
         }
         text{
@@ -59,10 +59,14 @@
     console.log("---: before data");
 
     var data = [];
-    var raw_data = JSON.parse("{{ data | escapejs }}");
-    console.log(raw_data[0].node_name);
-    console.log(raw_data[0].data);
-    raw_data = raw_data[0].data;
+    var data_json = JSON.parse("{{ data | escapejs }}"); // an array: {"node_name": node-name, "tn_data": transfer-node-data }
+    // data_json[0].node_name; // string
+    // data_json[0].tn_data; // an array
+    console.log(data_json);
+
+    var raw_data = data_json[0].tn_data[0];
+    raw_data = raw_data.data;
+    console.log(raw_data);
 
     console.log("---: before data processing");
     for (i = 0; i < raw_data.length; i++) {
@@ -74,63 +78,63 @@
 
     console.log("---: before domain");
 
-        x.domain(d3.extent(data, function(d) { return d.date; }));
-        y.domain(d3.extent(data, function(d) { return d.close; }));
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y.domain(d3.extent(data, function(d) { return d.close; }));
 
-        console.log("---: before line ");
+    console.log("---: before line ");
 
-        var line = d3.svg.line()
-                        .x(function(d) { return x(d.date); })
-                        .y(function(d) { return y(d.close); });
-        svg.append("g")
-                        .attr("class", "x axis")
-                        .attr("transform", "translate(0," + height + ")")
-                        .call(xAxis);
-        svg.append("g")
-                        .attr("class", "y axis")
-                        .call(yAxis)
-                        .append("text")
-                        .attr("transform", "rotate(0)")
-                        .attr("y", 25)
-                        .attr("x", 75)
-                        .attr("dy", ".71em")
-                        .style("text-anchor", "end")
-                        .text("data show");
-        console.log("---: before Inner");
+    var line = d3.svg.line()
+                    .x(function(d) { return x(d.date); })
+                    .y(function(d) { return y(d.close); });
+    svg.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(xAxis);
+    svg.append("g")
+                    .attr("class", "y axis")
+                    .call(yAxis)
+                    .append("text")
+                    .attr("transform", "rotate(0)")
+                    .attr("y", 25)
+                    .attr("x", 75)
+                    .attr("dy", ".71em")
+                    .style("text-anchor", "end")
+                    .text("data show");
+    console.log("---: before Inner");
 
 
-        var yInner = d3.svg.axis()
-                .scale(y)
-                .tickSize(-width,0,0)
-                .tickFormat("")
-                .orient("left")
-                .ticks(5);
-        var yInnerBar=svg.append("g")
-                .attr("class", "inner_line")
-                .attr("transform", "translate(0,-25)")
-                .call(yInner);
-        svg.append("path")
-            .datum(data)
-            .attr("class", "line")
-            .attr("d", line)
+    var yInner = d3.svg.axis()
+            .scale(y)
+            .tickSize(-width,0,0)
+            .tickFormat("")
+            .orient("left")
+            .ticks(5);
+    var yInnerBar=svg.append("g")
+            .attr("class", "inner_line")
+            .attr("transform", "translate(0,-25)")
+            .call(yInner);
+    svg.append("path")
+        .datum(data)
+        .attr("class", "line")
+        .attr("d", line)
+        .attr("opacity", 0)
+        .transition()
+        .duration(2000)
+        .attr("opacity", 1);
+
+    var points = svg.selectAll(".MyCircle")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr("class","MyCircle")
+            .attr("transform","translate(0,0)")
+            .attr("r", 3)
             .attr("opacity", 0)
             .transition()
             .duration(2000)
-            .attr("opacity", 1);
-
-        var points = svg.selectAll(".MyCircle")
-                .data(data)
-                .enter()
-                .append("circle")
-                .attr("class","MyCircle")
-                .attr("transform","translate(0,0)")
-                .attr("r", 3)
-                .attr("opacity", 0)
-                .transition()
-                .duration(2000)
-                .attr("cx", function(d){ return x(d.date); })
-                .attr("opacity", 1)
-                .attr("cy", function(d){ return y(d.close); });
+            .attr("cx", function(d){ return x(d.date); })
+            .attr("opacity", 1)
+            .attr("cy", function(d){ return y(d.close); });
 
     </script>
 </body>
