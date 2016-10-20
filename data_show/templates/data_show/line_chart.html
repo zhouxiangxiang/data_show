@@ -35,69 +35,69 @@
     var margin = {top: 20, right: 20, bottom: 30, left: 50};
     var width  = 590 - margin.left - margin.right;
     var height = 300 - margin.top - margin.bottom;
-    
+
     var svg = d3.select("body").append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
                 .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    
+
     var parseDate = d3.time.format("%Y-%m-%d").parse;
 
     var x = d3.time.scale().range([0, width]);
     var y = d3.scale.linear().range([height, 0]);
-    
+
     var xAxis = d3.svg.axis()
                       .scale(x)
                       .orient("bottom")
                       .tickFormat(d3.time.format("%m.%d"));
-    
+
     var yAxis = d3.svg.axis()
                       .scale(y)
                       .orient("left");
-    
-    
+
+
     d3.csv("data.csv", function(error, data) {
+        console.log(data);
         if (error) throw error;
-        
+
         data.forEach(function(d) {
-            console.log(d.date);
             d.date = parseDate(d.date);
             d.close = +d.close;
         });
-    
+
         x.domain(d3.extent(data, function(d) { return d.date; }));
         y.domain(d3.extent(data, function(d) { return d.close; }));
-        
-        var line = d3.svg.line()
-                        .x(function(d) { return x(d.date); })
-                        .y(function(d) { return y(d.close); });
+
+        var line = d3.svg.line().x(function(d) { return x(d.date); })
+                                .y(function(d) { return y(d.close); });
         svg.append("g")
-                        .attr("class", "x axis")
-                        .attr("transform", "translate(0," + height + ")")
-                        .call(xAxis);
+           .attr("class", "x axis")
+           .attr("transform", "translate(0," + height + ")")
+           .call(xAxis)
+           .append("text")
+           .text("test data");
         svg.append("g")
-                        .attr("class", "y axis")
-                        .call(yAxis)
-                        .append("text")
-                        .attr("transform", "rotate(0)")
-                        .attr("y", 25)
-                        .attr("x", 75)
-                        .attr("dy", ".71em")
-                        .style("text-anchor", "end")
-                        .text("我的数据");
-        
-        
+           .attr("class", "y axis")
+           .call(yAxis)
+           .append("text")
+           .attr("transform", "rotate(0)")
+           .attr("y", 25)
+           .attr("x", 75)
+           .attr("dy", ".71em")
+           .style("text-anchor", "end")
+           .text("my data");
+
         var yInner = d3.svg.axis()
-                .scale(y)
-                .tickSize(-width,0,0)
-                .tickFormat("")
-                .orient("left")
-                .ticks(5);
+                           .scale(y)
+                           .tickSize(-width,0,0)
+                           .tickFormat("")
+                           .orient("left")
+                           .ticks(5);
         var yInnerBar=svg.append("g")
-                .attr("class", "inner_line")
-                .attr("transform", "translate(0,-25)")
-                .call(yInner);
+                         .attr("class", "inner_line")
+                         .attr("transform", "translate(0,-25)")
+                         .call(yInner);
         svg.append("path")
             .datum(data)
             .attr("class", "line")
@@ -108,18 +108,46 @@
             .attr("opacity", 1);
 
         var points = svg.selectAll(".MyCircle")
-                .data(data)
-                .enter()
-                .append("circle")
-                .attr("class","MyCircle")
-                .attr("transform","translate(0,0)")
-                .attr("r", 3)
-                .attr("opacity", 0)
-                .transition()
-                .duration(2000)
-                .attr("cx", function(d){ return x(d.date); })
-                .attr("opacity", 1)
-                .attr("cy", function(d){ return y(d.close); });
+                        .data(data)
+                        .enter()
+                        .append("circle")
+                        .attr("class","MyCircle")
+                        .attr("transform","translate(0,0)")
+                        .attr("r", 3)
+                        .attr("opacity", 0)
+                        .transition()
+                        .duration(2000)
+                        .attr("cx", function(d){ return x(d.date); })
+                        .attr("opacity", 1)
+                        .attr("cy", function(d){ return y(d.close); });
+
+
+        data.forEach(function(d) {
+            d.close = d.close - 5;
+        });
+
+        svg.append("path")
+            .datum(data)
+            .attr("class", "line")
+            .attr("d", line)
+            .attr("opacity", 0)
+            .transition()
+            .duration(2000)
+            .attr("opacity", 1);
+
+        var points = svg.selectAll(".SMyCircle")
+                        .data(data)
+                        .enter()
+                        .append("circle")
+                        .attr("class","MyCircle")
+                        .attr("transform","translate(0,0)")
+                        .attr("r", 3)
+                        .attr("opacity", 0)
+                        .transition()
+                        .duration(2000)
+                        .attr("cx", function(d){ return x(d.date); })
+                        .attr("opacity", 1)
+                        .attr("cy", function(d){ return y(d.close); });
 
         });
     </script>

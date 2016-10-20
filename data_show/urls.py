@@ -12,6 +12,8 @@ urlpatterns = [
     url(r'^show', show),
     url(r'^templates/.*.css', data_css),
     # --
+    url(r'^test', test_chart),
+    url(r'^test_data.csv', test_data_csv),
     url(r'^line_chart', line_chart),
     url(r'^data.csv', data_csv),
 ]

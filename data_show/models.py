@@ -15,7 +15,7 @@ class  SpeedData:
     def __init__(self):
         self.db_info = DataBaseInfo('10.0.6.27', '3306', 'root', '123', 'DYN_PARENTS')
         self.fd = FetchSpeedData(self.db_info)
-        self.tb_name = 'tmp'
+        self.tb_name = 'dyn'
 
     def get_transfer_node(self):
         tn = self.fd.get_transfer_node(self.tb_name)

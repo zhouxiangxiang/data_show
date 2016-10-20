@@ -48,37 +48,54 @@ def get_data(request):
 
             sd = SpeedData()
             node_name = sd.get_node_name(node_room)
+            t_node = sd.get_transfer_node()
 
-            print(node_room)
-            print(node_name)
 
+            # all the data for a node room(which has many node names(machines))
             data = []
-            for item in node_name:
-                data_nn = sd.get_node_name_speed_time(item, "220.181.77.98")
-                # sort by timestamp
-                def getKey(tmp):
-                    return tmp[1];
-                data_nn = sorted(data_nn, key=getKey)
+            for i_nn in node_name:
 
-                start = 0
-                for i in range(len(data_nn)):
-                    s_t = data_nn[i]
-                    if not start:
-                        start = s_t[1]
-                    else:
-                        st_tm = datetime.datetime.fromtimestamp(start).strftime('%Y-%m-%d')
-                        cur_tm = datetime.datetime.fromtimestamp(s_t[1]).strftime('%Y-%m-%d')
-                        if st_tm != cur_tm:
-                            break;
+                # all the data for a node name(which has many transfer nodes)
+                tn_data = []
+                for i_tn in t_node:
+                    data_nn = sd.get_node_name_speed_time(i_nn, i_tn)
+                    if not data_nn:
+                        continue
 
-                    s_t = [s_t[0] / 1024,
-                           datetime.datetime.fromtimestamp(s_t[1]).strftime('%Y-%m-%d %H:%M:%S')]
-                    data_nn[i] = s_t 
+                    # sort by timestamp
+                    def getKey(tmp):
+                        return tmp[1];
+                    data_nn = sorted(data_nn, key=getKey)
 
-                data.append({'node_name': item, 'data': data_nn})
+                    secs_day = 86400 # 24 * 60 * 60
+                    start_tm = data_nn[0][1]
+                    for i in range(len(data_nn)):
+                        s_t = data_nn[i]
+
+                        if s_t[1]  - start_tm >= secs_day:
+                            data_nn = data_nn[:i]
+                            break
+
+                        data_nn[i] = [s_t[0] / 1024,
+                                      datetime.datetime.fromtimestamp(s_t[1]).strftime('%Y-%m-%d %H:%M:%S')]
+
+
+                    tn_data.append({'t_node':t_node, 'data' : data_nn })
+                data.append( {'node_name': i_nn, 'tn_data': tn_data })
 
             json_str = json.dumps(data)
-            print(json_str)
+            print("node_room: ", node_room)
+            print("node_name: ", node_name)
+            print("transfer node", t_node)
+            #print("********************")
+            #print(json_str)
+            #print("********************")
+
+            #for item in data:
+            #    print item["node_name"]
+            #    print item["tn_data"]
+            #    print
+            #    print
 
             return render(request, 'data_show/show_data.html', {"data": json_str})
         else:
@@ -89,6 +106,9 @@ def get_data(request):
 
 def line_chart(request):
     return render(request, 'data_show/line_chart.html')
+
+def test_chart(request):
+    return render(request, 'data_show/test.html')
 
 def get_name(request):
     if request.method == 'POST':
@@ -119,6 +139,13 @@ def data_css(request):
 
 def data_csv(request):
     fd = open('./data_show/templates/data_show/data.csv', 'r')
+    data = HttpResponse(fd.read())
+    fd.close()
+
+    return data
+
+def test_data_csv(request):
+    fd = open('./data_show/data/readme.csv', 'r')
     data = HttpResponse(fd.read())
     fd.close()
 
