@@ -68,6 +68,16 @@ class FetchSpeedData(FetchData):
         self.transfer_node = []
         self.all_node_room = []
         self.all_node_name = {}
+        self.node_name_data = {}
+#   table
+#        # one room
+#        room: [
+#            # one name
+#            name: [
+#                      # one transfer
+#                      { transfer: [] }
+#                  ]
+#        ]
 
     def get_transfer_node(self, tn):
         if not self.transfer_node:
@@ -126,9 +136,28 @@ class FetchSpeedData(FetchData):
         return self.fetch_data(pattern)
 
     def get_nn_ST(self, tn, nn, transfer_node):
-        pattern = 'SELECT speed, timestamp  FROM %s WHERE node_name="%s" and host="%s"'%(tn, nn, transfer_node)
+# table
+#        # one room
+#        room: [
+#            # one name
+#            name: [
+#                      # one transfer
+#                      { transfer: [] }
+#                  ]
+#        ]
+        if tn in self.node_name_data:
+            if nn in self.node_name_data[tn]:
+                if transfer_node in self.node_name_data[tn][nn]:
+                    return self.node_name_data[tn][nn][transfer_node]
+            else:
+                self.node_name_data[tn][nn] = {}
+        else:
+            self.node_name_data[tn] = {};
+            self.node_name_data[tn][nn] = {};
 
-        return self.fetch_data(pattern)
+        pattern = 'SELECT speed, timestamp  FROM %s WHERE node_name="%s" and host="%s"'%(tn, nn, transfer_node)
+        self.node_name_data[tn][nn][transfer_node] = self.fetch_data(pattern)
+        return self.node_name_data[tn][nn][transfer_node]
 
     #def get_node_room_ttfb():
     #def get_node_room_speed():

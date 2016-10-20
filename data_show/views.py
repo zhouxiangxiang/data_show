@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 # Create your views here.
 import datetime
+import time
 import json
 
 from django.db import connections
@@ -14,6 +15,8 @@ from django.template import loader
 from .models import *
 from .forms import *
 
+global_sd = SpeedData()
+
 def get_index(request):
     if request.method == 'POST':
         form = NodeForm(request.POST)
@@ -23,7 +26,7 @@ def get_index(request):
             form = NameForm()
             return render(request, 'data_show/index.html', {'form': form})
 
-    sd = SpeedData()
+    sd = global_sd
     raw_nr = sd.get_node_room()
 
     node_room = { "CUN": [], "CTN": [], "CMN": [], "OTH":[] }
@@ -41,24 +44,31 @@ def get_index(request):
     return render(request, 'data_show/index.html', {'data': json_str})
 
 def get_data(request):
+    print("---: enter : ", time.time())
+    sd = global_sd
     if request.method == 'POST':
         form = NodeForm(request.POST)
         if form.is_valid():
             node_room = form.cleaned_data['node_room']
 
-            sd = SpeedData()
+            # print("---: get_node_name: ", time.time())
             node_name = sd.get_node_name(node_room)
+            # print("---: get_transfer_node: ", time.time())
             t_node = sd.get_transfer_node()
 
 
+            # print("---: processing: ", time.time())
             # all the data for a node room(which has many node names(machines))
             data = []
+            print("---: for-loop: ", time.time())
             for i_nn in node_name:
 
                 # all the data for a node name(which has many transfer nodes)
                 tn_data = []
                 for i_tn in t_node:
+                    # print("---: start ---: get_node_name_speed_time: ", time.time())
                     data_nn = sd.get_node_name_speed_time(i_nn, i_tn)
+                    # print("---: end   ---: get_node_name_speed_time: ", time.time())
                     if not data_nn:
                         continue
 
@@ -81,12 +91,13 @@ def get_data(request):
 
 
                     tn_data.append({'t_node':i_tn, 'data' : data_nn })
+                    # print("---: end   ---: ", time.time())
                 data.append( {'node_name': i_nn, 'tn_data': tn_data })
 
             json_str = json.dumps(data)
-            print("node_room: ", node_room)
-            print("node_name: ", node_name)
-            print("transfer node", t_node)
+            #print("node_room: ", node_room)
+            #print("node_name: ", node_name)
+            #print("transfer node", t_node)
             #print("********************")
             #print(json_str)
             #print("********************")
@@ -97,6 +108,7 @@ def get_data(request):
             #    print
             #    print
 
+            print("---: return: ", time.time())
             return render(request, 'data_show/show_data.html', {"data": json_str})
         else:
             form = NodeForm()
